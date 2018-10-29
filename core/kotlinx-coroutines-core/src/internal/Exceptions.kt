@@ -7,9 +7,10 @@ package kotlinx.coroutines.internal
 import kotlinx.coroutines.*
 import java.util.*
 import kotlin.coroutines.*
+import kotlin.coroutines.intrinsics.*
 
 internal actual fun <E : Throwable> recoverStackTrace(exception: E): E {
-    if (!DEBUG || exception is CancellationException || exception is NonRecoverableThrowable) {
+    if (recoveryDisabled(exception)) {
         return exception
     }
 
@@ -42,10 +43,14 @@ private fun <E : Throwable> E.sanitizeStackTrace(): E {
 }
 
 internal actual fun <E : Throwable> recoverStackTrace(exception: E, continuation: Continuation<*>): E {
-    if (!DEBUG || exception is CancellationException || exception is NonRecoverableThrowable || continuation !is CoroutineStackFrame) {
+    if (recoveryDisabled(exception) || continuation !is CoroutineStackFrame) {
         return exception
     }
 
+    return recoverFromStackFrame(exception, continuation)
+}
+
+private fun <E : Throwable> recoverFromStackFrame(exception: E, continuation: CoroutineStackFrame): E {
     val newException = tryCopyException(exception) ?: return exception
     val stacktrace = createStackTrace(continuation)
     if (stacktrace.isEmpty()) return exception
@@ -55,8 +60,17 @@ internal actual fun <E : Throwable> recoverStackTrace(exception: E, continuation
 }
 
 
+@Suppress("NOTHING_TO_INLINE")
+internal actual suspend inline fun recoverAndThrow(exception: Throwable): Nothing {
+    if (recoveryDisabled(exception)) throw exception
+    suspendCoroutineUninterceptedOrReturn<Nothing> {
+        if (it !is CoroutineStackFrame) throw exception
+        throw  recoverFromStackFrame(exception, it)
+    }
+}
+
 internal actual fun <E : Throwable> unwrap(exception: E): E {
-    if (!DEBUG || exception is CancellationException || exception is NonRecoverableThrowable) {
+    if (recoveryDisabled(exception)) {
         return exception
     }
 
@@ -68,6 +82,9 @@ internal actual fun <E : Throwable> unwrap(exception: E): E {
         return exception
     }
 }
+
+private fun <E : Throwable> recoveryDisabled(exception: E) =
+    !RECOVER_STACKTRACE || !DEBUG || exception is CancellationException || exception is NonRecoverableThrowable
 
 @Suppress("UNCHECKED_CAST")
 private fun <E : Throwable> tryCopyException(exception: E): E? {

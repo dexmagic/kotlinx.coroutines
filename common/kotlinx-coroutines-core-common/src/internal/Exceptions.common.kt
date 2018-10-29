@@ -26,6 +26,10 @@ internal expect fun <E: Throwable> recoverStackTrace(exception: E, continuation:
  */
 internal expect fun <E: Throwable> recoverStackTrace(exception: E): E
 
+// Name conflict with recoverStackTrace
+@Suppress("NOTHING_TO_INLINE")
+internal expect suspend inline fun recoverAndThrow(exception: Throwable): Nothing
+
 /**
  * The opposite of [recoverStackTrace].
  * It is guaranteed that `unwrap(recoverStackTrace(e)) === e`
