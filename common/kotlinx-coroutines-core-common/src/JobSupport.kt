@@ -242,8 +242,10 @@ public open class JobSupport constructor(active: Boolean) : Job, ChildJob, Paren
         val seenExceptions = identitySet<Throwable>(exceptions.size)
         var suppressed = false
         for (exception in exceptions) {
-            if (exception !== rootCause && exception !is CancellationException && seenExceptions.add(exception)) {
-                rootCause.addSuppressedThrowable(exception)
+            // Unwrap original exception from one with recovered stacktrace
+            val unwrapped = unwrap(exception)
+            if (unwrapped !== rootCause && unwrapped !is CancellationException && seenExceptions.add(exception)) {
+                rootCause.addSuppressedThrowable(unwrapped)
                 suppressed = true
             }
         }
@@ -1077,7 +1079,7 @@ public open class JobSupport constructor(active: Boolean) : Job, ChildJob, Paren
             val state = this.state
             if (state !is Incomplete) {
                 // already complete -- just return result
-                if (state is CompletedExceptionally) throw state.cause
+                if (state is CompletedExceptionally) throw recoverStackTrace(state.cause)
                 return state
 
             }
@@ -1233,7 +1235,7 @@ private class ResumeAwaitOnCompletion<T>(
         check(state !is Incomplete)
         if (state is CompletedExceptionally) {
             // Resume with exception in atomic way to preserve exception
-            continuation.resumeWithExceptionMode(state.cause, MODE_ATOMIC_DEFAULT)
+            continuation.resumeWithExceptionMode(recoverStackTrace(state.cause, continuation), MODE_ATOMIC_DEFAULT)
         } else {
             // Resuming with value in a cancellable way (AwaitContinuation is configured for this mode).
             @Suppress("UNCHECKED_CAST")

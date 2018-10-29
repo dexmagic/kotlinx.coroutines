@@ -81,11 +81,13 @@ internal object UndispatchedEventLoop {
 internal class DispatchedContinuation<in T>(
     @JvmField val dispatcher: CoroutineDispatcher,
     @JvmField val continuation: Continuation<T>
-) : Continuation<T> by continuation, DispatchedTask<T> {
+) : Continuation<T> by continuation, DispatchedTask<T>, CoroutineStackFrame {
     @JvmField
     @Suppress("PropertyName")
     internal var _state: Any? = UNDEFINED
     public override var resumeMode: Int = 0
+    override val callerFrame: CoroutineStackFrame? = continuation as? CoroutineStackFrame
+    override fun getStackTraceElement(): StackTraceElement? = null
     @JvmField // pre-cached value to avoid ctx.fold on every resumption
     internal val countOrElement = threadContextElements(context)
 
