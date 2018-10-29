@@ -1079,7 +1079,11 @@ public open class JobSupport constructor(active: Boolean) : Job, ChildJob, Paren
             val state = this.state
             if (state !is Incomplete) {
                 // already complete -- just return result
-                if (state is CompletedExceptionally) throw recoverStackTrace(state.cause)
+                if (state is CompletedExceptionally) {
+                    suspendCoroutineUninterceptedOrReturn<Unit> {
+                        throw recoverStackTrace(state.cause, it)
+                    }
+                }
                 return state
 
             }

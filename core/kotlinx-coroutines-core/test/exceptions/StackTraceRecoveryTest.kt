@@ -54,16 +54,10 @@ class StackTraceRecoveryTest : TestBase() {
         val stacktrace = listOf(
             "java.util.concurrent.ExecutionException\n" +
                     "\t(Current coroutine stacktrace)\n" +
-                    "\tat kotlinx.coroutines.JobSupport.awaitInternal\$kotlinx_coroutines_core(JobSupport.kt:959)\n" +
-                    "\tat kotlinx.coroutines.DeferredCoroutine.await\$suspendImpl(Builders.common.kt:99)\n" +
-                    "\tat kotlinx.coroutines.DeferredCoroutine.await(Builders.common.kt)\n" +
-                    "\tat kotlinx.coroutines.exceptions.StackTraceRecoveryTest.oneMoreNestedMethod(StackTraceRecoveryTest.kt:66)\n" +
-                    "\tat kotlinx.coroutines.exceptions.StackTraceRecoveryTest.nestedMethod(StackTraceRecoveryTest.kt:60)\n" +
-                    "\tat kotlinx.coroutines.exceptions.StackTraceRecoveryTest\$testCompletedAsync\$1.invokeSuspend(StackTraceRecoveryTest.kt:56)\n" +
-                    "\tat kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:32)\n" +
-                    "\tat kotlinx.coroutines.DispatchedTask\$DefaultImpls.run(Dispatched.kt:146)\n" +
-                    "\tat kotlinx.coroutines.AbstractContinuation.run(AbstractContinuation.kt:19)\n" +
-                    "\tat kotlinx.coroutines.EventLoopBase.processNextEvent(EventLoop.kt:140)",
+                    "\tat kotlinx/coroutines/DeferredCoroutine.await\$suspendImpl(Builders.common.kt:99)\n" +
+                    "\tat kotlinx/coroutines/exceptions/StackTraceRecoveryTest.oneMoreNestedMethod(StackTraceRecoveryTest.kt:81)\n" +
+                    "\tat kotlinx/coroutines/exceptions/StackTraceRecoveryTest.nestedMethod(StackTraceRecoveryTest.kt:75)\n" +
+                    "\tat kotlinx/coroutines/exceptions/StackTraceRecoveryTest\$testCompletedAsync\$1.invokeSuspend(StackTraceRecoveryTest.kt:71)",
             "Caused by: java.util.concurrent.ExecutionException\n" +
                     "\tat kotlinx.coroutines.exceptions.StackTraceRecoveryTest\$testCompletedAsync\$1\$deferred\$1.invokeSuspend(StackTraceRecoveryTest.kt:44)\n" +
                     "\tat kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:32)"
