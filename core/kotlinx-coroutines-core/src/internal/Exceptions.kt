@@ -128,7 +128,8 @@ private fun createStackTrace(continuation: CoroutineStackFrame): ArrayList<Stack
 }
 
 
-internal fun artificialFrame(message: String) = java.lang.StackTraceElement("\b\b\b($message", "\b", "\b", -1)
+@InternalCoroutinesApi
+public fun artificialFrame(message: String) = java.lang.StackTraceElement("\b\b\b($message", "\b", "\b", -1)
 internal fun StackTraceElement.isArtificial() = className.startsWith("\b\b\b")
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
